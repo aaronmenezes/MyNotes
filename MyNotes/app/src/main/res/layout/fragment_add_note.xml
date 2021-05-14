@@ -16,31 +16,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:padding="10dp"
-                    android:src="@drawable/left_arrow" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                    android:text="@string/note_add_dir"
-                    android:fontFamily="@font/quicksand_medium"
-                    android:textAlignment="gravity"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textField"
                 android:layout_width="match_parent"

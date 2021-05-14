@@ -7,23 +7,27 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.kyser.mynotes.databinding.FragmentAddNoteBinding
 import com.kyser.mynotes.model.service.NotesManager
+import com.kyser.mynotes.view.MainActivity
+import com.kyser.mynotes.view.viewmodel.NoteGridViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddNote : Fragment() {
 
+    private lateinit var mNoteListModel: NoteGridViewModel
     private lateinit var addNoteBinding: FragmentAddNoteBinding
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?,  savedInstanceState: Bundle? ): View? {
         addNoteBinding = FragmentAddNoteBinding.inflate(inflater, container, false)
-        addNoteBinding.back.setOnClickListener { view -> requireActivity().onBackPressed() }
+        (activity as MainActivity).getMainBinding().toolbar.setNavigationOnClickListener(View.OnClickListener {requireActivity().onBackPressed()})
         addNoteBinding.btnSave.setOnClickListener { view -> addNewNote() }
+        mNoteListModel =   (activity as MainActivity).getViewModel()
         return addNoteBinding.root
     }
     private fun addNewNote() {
         val s = SimpleDateFormat("ddMMyyyyhhmmss")
         val format = s.format(Date())
-        NotesManager.instance.addNewNote(  addNoteBinding.noteTitleInp.text.toString(),  format, "1", addNoteBinding.noteBodyInp.text.toString() )
+        mNoteListModel.addNewNote(  addNoteBinding.noteTitleInp.text.toString(),  format, "1", addNoteBinding.noteBodyInp.text.toString() )
         requireActivity().onBackPressed()
     }
     companion object {

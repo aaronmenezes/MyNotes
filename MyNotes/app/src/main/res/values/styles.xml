@@ -16,4 +16,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
+    <style name= "Toolbar_titleTextAppearance">
+        <item name = "android:textSize">25sp</item>
+    </style>
 </resources>

@@ -47,39 +47,44 @@ class NotesManager() {
         })
     }
 
-    fun addNewNote( name: String, date: String, priority: String, body: String) {
+    fun addNewNote( name: String, date: String, priority: String, body: String, notelist: MutableLiveData<List<Note>>) {
         mNotesService.addNewNote(name, date, priority, body).enqueue(object : Callback<List<Note>> {
-            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>>) {}
-
+            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>>) {
+                getAllNotes(notelist)
+            }
             override fun onFailure( call: Call<List<Note>>, t: Throwable ) {
                 println(t.message)
             }
         })
     }
 
-    fun updateNote(id: Int, name: String, body: String) {
+    fun updateNote(id: Int, name: String, body: String, notelist: MutableLiveData<List<Note>>) {
         mNotesService.updateNote(id, name, body).enqueue(object : Callback<List<Note>> {
-            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) { }
-
+            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) {
+                getAllNotes(notelist)
+            }
             override fun onFailure( call: Call<List<Note>>, t: Throwable ) {
                 println(t.message)
             }
         })
     }
 
-    fun deleteNote(id: Int) {
+    fun deleteNote(id: Int,notelist: MutableLiveData<List<Note>>) {
         mNotesService.deleteNote(id).enqueue(object : Callback<List<Note>> {
-            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) { }
-
+            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) {
+                getAllNotes(notelist)
+            }
             override fun onFailure( call: Call<List<Note>>, t: Throwable ) {
                 println(t.message)
             }
         })
     }
 
-    fun updateNotePriority(id: Int, priority: Int) {
+    fun updateNotePriority(id: Int, priority: Int,notelist: MutableLiveData<List<Note>>) {
         mNotesService.updateNotePriority(id, priority) .enqueue(object : Callback<List<Note>> {
-            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) { }
+            override fun onResponse( call: Call<List<Note>>, response: Response<List<Note>> ) {
+                getAllNotes(notelist)
+            }
 
             override fun onFailure( call: Call<List<Note>>, t: Throwable ) {
                 println(t.message)

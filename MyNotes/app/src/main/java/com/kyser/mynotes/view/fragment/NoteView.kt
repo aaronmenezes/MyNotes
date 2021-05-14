@@ -8,10 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.kyser.mynotes.databinding.FragmentNoteViewBinding
-import com.kyser.mynotes.model.service.NotesManager
+import com.kyser.mynotes.view.MainActivity
+import com.kyser.mynotes.view.viewmodel.NoteGridViewModel
+import kotlinx.android.synthetic.main.activity_main.*
 
 class NoteView : Fragment(), TextWatcher {
 
+    private lateinit var mNoteListModel: NoteGridViewModel
     private lateinit var mFragmentBinding: FragmentNoteViewBinding
     private var mNoteId = 0
     private var mTextUpdate = false
@@ -23,20 +26,21 @@ class NoteView : Fragment(), TextWatcher {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mFragmentBinding.back.setOnClickListener { view -> backPressed() }
         mNoteId = requireArguments().getInt("id")
         mFragmentBinding.noteTitleInp.setText(requireArguments().getString("title"))
         mFragmentBinding.noteBodyInp.setText(requireArguments().getString("note"))
         mFragmentBinding.noteTitleInp.addTextChangedListener(this)
         mFragmentBinding.noteBodyInp.addTextChangedListener(this)
+        mNoteListModel =   (activity as MainActivity).getViewModel()
+        (activity as MainActivity).getMainBinding().toolbar.setNavigationOnClickListener(View.OnClickListener { backPressed() })
     }
 
+
+
     private fun backPressed() {
-        if (mTextUpdate) NotesManager.instance.updateNote(
-            mNoteId,
-            mFragmentBinding.noteTitleInp.text.toString(),
-            mFragmentBinding.noteBodyInp.text.toString()
-        )
+        if (mTextUpdate)
+            mNoteListModel.updateNote(  mNoteId,  mFragmentBinding.noteTitleInp.text.toString(), mFragmentBinding.noteBodyInp.text.toString() )
+        (activity as MainActivity).getMainBinding().toolbar.setNavigationOnClickListener(null)
         requireActivity().onBackPressed()
     }
     companion object {

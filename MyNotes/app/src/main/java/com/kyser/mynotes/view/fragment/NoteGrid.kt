@@ -13,6 +13,7 @@ import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kyser.mynotes.R
@@ -29,9 +30,6 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
     private lateinit var mNoteGridAdaptor: NoteGridAdaptor
     private lateinit var mNoteGridBinding: FragmentNoteGridBinding
 
-    /*override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }*/
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
         mNoteGridBinding = FragmentNoteGridBinding.inflate(inflater, container, false)
@@ -44,7 +42,7 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
         mNoteGridAdaptor = NoteGridAdaptor(requireContext(),this);
         mNoteGridBinding.noteGrid.adapter = mNoteGridAdaptor
         mNoteGridBinding.noteGrid.addItemDecoration( SpaceItemDecoration(20,20,true))
-        mNoteListModel = ViewModelProvider(this).get(NoteGridViewModel::class.java)
+        mNoteListModel =   (activity as MainActivity).getViewModel()
         mNoteListModel.getNoteList().observe( viewLifecycleOwner, Observer { model->run{
             println(model[0].getBody())
             mNoteGridAdaptor.setNoteList(model)
@@ -91,8 +89,7 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .show()
     }
     private fun deleteNote(note: Note) {
-        NotesManager.instance.deleteNote(note.getId())
-        updateNoteList()
+        mNoteListModel.deleteNote(note.getId())
     }
     private fun showPriorityDialog(note: Note) {
         val input = EditText(context)
@@ -103,7 +100,9 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .setMessage(resources.getString(R.string.priority_dialog_desc))
             .setView(input)
             .setPositiveButton( resources.getString(R.string.delete_dialog_yes) ) { dialogInterface: DialogInterface, i: Int ->
-                note.setPriority(input.text.toString().toInt())
+                var priorty = input.text.toString().toInt()
+                if(priorty>5)priorty= 5;
+                note.setPriority(priorty)
                 updateNotePriority(note)
             }
             .setNegativeButton(resources.getString(R.string.delete_dialog_no)) { dialogInterface: DialogInterface, i: Int ->
@@ -115,17 +114,7 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .show()
     }
     private fun updateNotePriority(note: Note) {
-        NotesManager.instance.updateNotePriority(note.getId(), note.getPriority())
-        updateNoteList()
+        mNoteListModel.updateNotePriority(note.getId(), note.getPriority())
     }
-    private fun updateNoteList() {
-        /*mNoteListModel.getNoteList().observe(this, { notes ->
-            ( mainBinding.content.noteGrid.adapter as NoteGridAdaptor).setNoteList(notes)
-            if (getView() != null) Snackbar.make(
-                getView(),
-                R.string.snack_bar_note_refresh,
-                Snackbar.LENGTH_SHORT
-            ).show()
-        })*/
-    }
+
 }

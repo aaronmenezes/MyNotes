@@ -1,3 +1,5 @@
+package com.kyser.mynotes.view.adaptor
+
 import com.kyser.mynotes.databinding.NoteGridItemBinding
 
 import android.content.Context
@@ -38,13 +40,13 @@ class NoteGridAdaptor(val mContext: Context, val itemEvent: ItemEvent )  :
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.itemBinding.itemTitle.text = noteList[position].getName()
-        holder.itemBinding.itemBody.text = noteList[position].getBody()
+        holder.itemBinding.itemTitle.text = noteList[position].name
+        holder.itemBinding.itemBody.text = noteList[position].body
         holder.itemBinding.root.setOnClickListener { view -> itemEvent.onItemClick(view, noteList[position]) }
         holder.itemBinding.itemMenu.setOnClickListener { view ->
             itemEvent.onItemMenuClick( view, noteList[position])
         }
-        val c = mContext?.resources.getIdentifier( "note_priority_" + noteList[position].getPriority(),"color", mContext?.packageName )
+        val c = mContext?.resources.getIdentifier( "note_priority_" + noteList[position].priority,"color", mContext?.packageName )
         val background: Drawable = holder.itemBinding.root.background
         if (background is ShapeDrawable) {
             background.paint.color = c
@@ -54,7 +56,7 @@ class NoteGridAdaptor(val mContext: Context, val itemEvent: ItemEvent )  :
     }
 
     override fun getItemCount(): Int {
-        return noteList?.size ?: 0
+        return noteList?.size
     }
 
     class Holder(val itemBinding: NoteGridItemBinding) : RecyclerView.ViewHolder(itemBinding.root)

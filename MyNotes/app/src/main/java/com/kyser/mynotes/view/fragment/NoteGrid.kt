@@ -1,33 +1,37 @@
 package com.kyser.mynotes.view.fragment
 
-import NoteGridAdaptor
+import com.kyser.mynotes.view.adaptor.NoteGridAdaptor
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kyser.mynotes.R
 import com.kyser.mynotes.databinding.FragmentNoteGridBinding
 import com.kyser.mynotes.model.Note
-import com.kyser.mynotes.model.service.NotesManager
+import com.kyser.mynotes.util.DataState
 import com.kyser.mynotes.view.MainActivity
 import com.kyser.mynotes.view.component.SpaceItemDecoration
-import com.kyser.mynotes.view.viewmodel.NoteGridViewModel
+import com.kyser.mynotes.view.viewmodel.MainStateEvent
+import com.kyser.mynotes.view.viewmodel.NoteViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.Observer
 
+@AndroidEntryPoint
 class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
 
-    private lateinit var mNoteListModel: NoteGridViewModel
-    private lateinit var mNoteGridAdaptor: NoteGridAdaptor
+    private val viewModel: NoteViewModel by activityViewModels()
+    private lateinit var mNoteGridAdaptor:NoteGridAdaptor
     private lateinit var mNoteGridBinding: FragmentNoteGridBinding
 
 
@@ -42,11 +46,23 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
         mNoteGridAdaptor = NoteGridAdaptor(requireContext(),this);
         mNoteGridBinding.noteGrid.adapter = mNoteGridAdaptor
         mNoteGridBinding.noteGrid.addItemDecoration( SpaceItemDecoration(20,20,true))
-        mNoteListModel =   (activity as MainActivity).getViewModel()
-        mNoteListModel.getNoteList().observe( viewLifecycleOwner, Observer { model->run{
-            println(model[0].getBody())
-            mNoteGridAdaptor.setNoteList(model)
-        } } )
+
+         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState->
+             run {
+                 when (dataState) {
+                     is DataState.Success<List<Note>> -> {
+                         mNoteGridAdaptor.setNoteList(dataState.data)
+                     }
+                     is DataState.Error -> {
+                          Toast.makeText(context,"=error", Toast.LENGTH_SHORT).show()
+                     }
+                     is DataState.Loading -> {
+                         Toast.makeText(context,"=loading", Toast.LENGTH_SHORT).show()
+                     }
+                 }
+             }
+         })
+        viewModel.setStateEvent(MainStateEvent.GetNotesEvent)
     }
 
     companion object {
@@ -56,9 +72,10 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
 
     override fun onItemClick(itemView: View, note: Note) {
         val bundle = Bundle()
-        bundle.putInt("id", note.getId())
-        bundle.putString("title", note.getName())
-        bundle.putString("note", note.getBody())
+        bundle.putSerializable("note",note)
+        bundle.putInt("id", note.id)
+        bundle.putString("title", note.name)
+        bundle.putString("body", note.body)
         (activity as MainActivity).getNavController().navigate(R.id.action_noteGrid_to_noteView, bundle)
     }
 
@@ -89,11 +106,11 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .show()
     }
     private fun deleteNote(note: Note) {
-        mNoteListModel.deleteNote(note.getId())
+        viewModel.setStateEvent(MainStateEvent.DeleteNoteEvent,note)
     }
     private fun showPriorityDialog(note: Note) {
         val input = EditText(context)
-        input.setText(note.getPriority().toString() )
+        input.setText(note.priority.toString() )
         input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_CLASS_NUMBER
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getString(R.string.priority_dialog_title))
@@ -102,7 +119,7 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .setPositiveButton( resources.getString(R.string.delete_dialog_yes) ) { dialogInterface: DialogInterface, i: Int ->
                 var priorty = input.text.toString().toInt()
                 if(priorty>5)priorty= 5;
-                note.setPriority(priorty)
+                note.priority=priorty
                 updateNotePriority(note)
             }
             .setNegativeButton(resources.getString(R.string.delete_dialog_no)) { dialogInterface: DialogInterface, i: Int ->
@@ -114,7 +131,9 @@ class NoteGrid : Fragment(), NoteGridAdaptor.ItemEvent {
             .show()
     }
     private fun updateNotePriority(note: Note) {
-        mNoteListModel.updateNotePriority(note.getId(), note.getPriority())
+        viewModel.setStateEvent(MainStateEvent.UpdateNotesPriorityEvent,note)
     }
 
 }
+
+

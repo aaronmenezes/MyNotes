@@ -1,9 +1,7 @@
-package com.kyser.mynotes.model.service
+package com.kyser.mynotes.service
 
 import androidx.lifecycle.MutableLiveData
 import com.kyser.mynotes.model.Note
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class NotesManager() {
-
+    /*
     private val BASE_URL = "https://day-notes.herokuapp.com/"
 
     init {
@@ -21,7 +19,9 @@ class NotesManager() {
     private object holder{
         val Instance =NotesManager();
     }
+    object Notesmanager{
 
+    }
     companion object{
         val instance: NotesManager by lazy { holder.Instance }
         private lateinit var mNotesService: NotesService
@@ -90,5 +90,5 @@ class NotesManager() {
                 println(t.message)
             }
         })
-    }
+    }*/
 }

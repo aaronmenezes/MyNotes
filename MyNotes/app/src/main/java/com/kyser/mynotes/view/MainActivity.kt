@@ -5,20 +5,16 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
 import com.kyser.mynotes.R
 import com.kyser.mynotes.databinding.ActivityMainBinding
-import com.kyser.mynotes.view.viewmodel.NoteGridViewModel
-import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.android.synthetic.main.fragment_add_note.view.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var mNoteListModel: NoteGridViewModel
     private lateinit var mainBinding: ActivityMainBinding;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,17 +26,11 @@ class MainActivity : AppCompatActivity(){
         mainBinding.fab.setOnClickListener { view ->
             getNavController().navigate(R.id.action_noteGrid_to_addNote)
         }
-        mNoteListModel = ViewModelProvider(this).get(NoteGridViewModel::class.java)
     }
 
     fun getNavController(): NavController {
         return Navigation.findNavController(mainBinding.content.navHostFragment)
     }
-
-    fun getViewModel():NoteGridViewModel{
-        return mNoteListModel
-    }
-
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
